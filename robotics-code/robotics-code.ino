@@ -50,9 +50,9 @@ float timeNow, timeThen, dt = 0.0;
 
 // Math variables and PID
 float proportional, integral, derivative = 0.0;
-float kp = 1.00;     // Needs to be small
-float ki = 1.00;     // Needs to be smallest
-float kd = 10.00;     // Needs to be biggest
+float kp = 0.45;     // Needs to be small
+float ki = 0.70;     // Needs to be smallest
+float kd = 0.01;     // Needs to be biggest
 float toDeg = 180 / PI;
 float error, oldError, corrected = 0.0;
 float finalAngleX, finalAngleY = 0.0;
@@ -66,8 +66,6 @@ void processMPU();
 void mtrctrl();
 void MPUdisplay();
 void MPUerror();
-
-
 
 void setup(){
     Serial.begin(BAUD);
@@ -148,13 +146,11 @@ void timeCtrl(){
 }
 
 void mtrctrl(){
-    actual = setPoint - finalAngleY;
-    servoPos = pid(map(finalAngleY, -90, 90, 0, 180));   // References use +/- 170000 for mapping but not sure why
-    if (servoPos != oldServo){
-      mtr.write(actual);
-      oldServo = servoPos;
+    servoPos = pid(map(finalAngleX, -17000, 17000, 0 , 170));
+    if (setPoint != finalAngleX){
+      servoPos += finalAngleX;
+      mtr.write(servoPos);
     }
-    oldError = actual;
 }
 
 void MPUdisplay(){
@@ -169,7 +165,7 @@ void MPUdisplay(){
 
 void MPUerror(){
     Serial.println("Calibrating MPU - Recording Error. . .");
-    const int RANGE = 200;
+    const int RANGE = 100;
     for(int i = 0; i < RANGE; i++){
       rawMPU();
       accErrorX = atan2(rawAy,         sqrt(pow(rawAx,2) + pow(rawAz,2))) * toDeg;
