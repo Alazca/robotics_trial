@@ -12,8 +12,8 @@ forum.arduino.cc                 -- General help with pinout / specifications
 Ian Carey (YouTube)              -- Integrating PID to arduino codebase 
 Phil's Lab (YouTube)             -- Error Filter for MPU
 Electronoobs (YouTube)           -- General microcontrollers
-******************************/
 
+******************************/
 #include <Wire.h>
 #include <Servo.h>
 #include <math.h>
@@ -51,8 +51,8 @@ float timeNow, timeThen, dt = 0.0;
 // Math variables and PID
 float proportional, integral, derivative = 0.0;
 float kp = 1.00;     // Needs to be small
-float ki = 0.00;     // Needs to be smallest
-float kd = 0.00;     // Needs to be biggest
+float ki = 1.00;     // Needs to be smallest
+float kd = 10.00;     // Needs to be biggest
 float toDeg = 180 / PI;
 float error, oldError, corrected = 0.0;
 float finalAngleX, finalAngleY = 0.0;
@@ -148,8 +148,8 @@ void timeCtrl(){
 }
 
 void mtrctrl(){
-    actual = setPoint - finalAngleX;
-    servoPos = pid(map(finalAngleX, -90, 90, 0, 180));   // References use +/- 170000 for mapping but not sure why
+    actual = setPoint - finalAngleY;
+    servoPos = pid(map(finalAngleY, -90, 90, 0, 180));   // References use +/- 170000 for mapping but not sure why
     if (servoPos != oldServo){
       mtr.write(actual);
       oldServo = servoPos;
@@ -175,7 +175,7 @@ void MPUerror(){
       accErrorX = atan2(rawAy,         sqrt(pow(rawAx,2) + pow(rawAz,2))) * toDeg;
       accErrorY = atan2(-1 * rawAx,    sqrt(pow(rawAy,2) + pow(rawAz,2))) * toDeg;
       i++;
-      delay(15);
+      delay(25);
     }
     accErrorX = accErrorX / RANGE;
     accErrorY = accErrorY / RANGE;
@@ -185,7 +185,7 @@ void MPUerror(){
       gyroErrorY += rawGy; 
       gyroErrorZ += rawGz; 
       i++;
-      delay(15);
+      delay(25);
     }
     gyroErrorX = gyroErrorX / RANGE;
     gyroErrorY = gyroErrorY / RANGE;
